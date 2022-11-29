@@ -1,11 +1,14 @@
 package stats
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/asticode/interceptor/internal/ntp"
+	"github.com/pion/interceptor"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"
 	"github.com/stretchr/testify/assert"
@@ -286,6 +289,78 @@ func TestStatsRecorder(t *testing.T) {
 			assert.Equal(t, cc.expectedOutboundRTPStreamStats, s.OutboundRTPStreamStats)
 			assert.Equal(t, cc.expectedRemoteInboundRTPStreamStats, s.RemoteInboundRTPStreamStats)
 			assert.Equal(t, cc.expectedRemoteOutboundRTPStreamStats, s.RemoteOutboundRTPStreamStats)
+		})
+	}
+}
+
+func TestGetStatsNotBlocking(t *testing.T) {
+	r := newRecorder(0, 90_000)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	go func() {
+		defer cancel()
+		r.Start()
+		r.GetStats()
+	}()
+	go r.Stop()
+
+	<-ctx.Done()
+
+	if err := ctx.Err(); err != nil && errors.Is(err, context.DeadlineExceeded) {
+		t.Error("it shouldn't block")
+	}
+}
+
+func TestQueueNotBlocking(t *testing.T) {
+	for _, i := range []struct {
+		f    func(r *recorder)
+		name string
+	}{
+		{
+			f: func(r *recorder) {
+				r.QueueIncomingRTP(time.Now(), mustMarshalRTP(t, rtp.Packet{}), interceptor.Attributes{})
+			},
+			name: "QueueIncomingRTP",
+		},
+		{
+			f: func(r *recorder) {
+				r.QueueOutgoingRTP(time.Now(), &rtp.Header{}, mustMarshalRTP(t, rtp.Packet{}), interceptor.Attributes{})
+			},
+			name: "QueueOutgoingRTP",
+		},
+		{
+			f: func(r *recorder) {
+				r.QueueIncomingRTCP(time.Now(), mustMarshalRTCPs(t, &rtcp.CCFeedbackReport{}), interceptor.Attributes{})
+			},
+			name: "QueueIncomingRTCP",
+		},
+		{
+			f: func(r *recorder) {
+				r.QueueOutgoingRTCP(time.Now(), []rtcp.Packet{}, interceptor.Attributes{})
+			},
+			name: "QueueOutgoingRTCP",
+		},
+	} {
+		t.Run(i.name+"NotBlocking", func(t *testing.T) {
+			r := newRecorder(0, 90_000)
+
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+
+			go func() {
+				defer cancel()
+				r.Start()
+				i.f(r)
+			}()
+			go r.Stop()
+
+			<-ctx.Done()
+
+			if err := ctx.Err(); err != nil && errors.Is(err, context.DeadlineExceeded) {
+				t.Error("it shouldn't block")
+			}
 		})
 	}
 }
