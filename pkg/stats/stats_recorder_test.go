@@ -263,8 +263,7 @@ func TestStatsRecorder(t *testing.T) {
 		t.Run(fmt.Sprintf("%v:%v", i, cc.name), func(t *testing.T) {
 			r := newRecorder(0, 90_000)
 
-			go r.Start()
-			defer r.Stop()
+			r.Start()
 
 			for _, record := range cc.records {
 				switch v := record.content.(type) {
@@ -284,6 +283,8 @@ func TestStatsRecorder(t *testing.T) {
 			}
 
 			s := r.GetStats()
+
+			r.Stop()
 
 			assert.Equal(t, cc.expectedInboundRTPStreamStats, s.InboundRTPStreamStats)
 			assert.Equal(t, cc.expectedOutboundRTPStreamStats, s.OutboundRTPStreamStats)
