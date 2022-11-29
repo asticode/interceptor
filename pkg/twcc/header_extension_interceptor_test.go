@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/asticode/interceptor/internal/test"
 	"github.com/pion/interceptor"
-	"github.com/pion/interceptor/internal/test"
 	"github.com/pion/rtp"
 	"github.com/stretchr/testify/assert"
 )

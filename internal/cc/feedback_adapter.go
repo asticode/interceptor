@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/asticode/interceptor/internal/ntp"
 	"github.com/pion/interceptor"
-	"github.com/pion/interceptor/internal/ntp"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"
 )

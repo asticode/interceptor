@@ -3,9 +3,9 @@ package stats
 import (
 	"time"
 
+	"github.com/asticode/interceptor/internal/ntp"
+	"github.com/asticode/interceptor/internal/sequencenumber"
 	"github.com/pion/interceptor"
-	"github.com/pion/interceptor/internal/ntp"
-	"github.com/pion/interceptor/internal/sequencenumber"
 	"github.com/pion/logging"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"

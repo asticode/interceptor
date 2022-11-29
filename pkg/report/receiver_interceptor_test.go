@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/asticode/interceptor/internal/ntp"
+	"github.com/asticode/interceptor/internal/test"
 	"github.com/pion/interceptor"
-	"github.com/pion/interceptor/internal/ntp"
-	"github.com/pion/interceptor/internal/test"
 	"github.com/pion/logging"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"

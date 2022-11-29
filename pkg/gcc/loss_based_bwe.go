@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pion/interceptor/internal/cc"
+	"github.com/asticode/interceptor/internal/cc"
 	"github.com/pion/logging"
 )
 

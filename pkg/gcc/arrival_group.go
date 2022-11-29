@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pion/interceptor/internal/cc"
+	"github.com/asticode/interceptor/internal/cc"
 )
 
 type arrivalGroup struct {
